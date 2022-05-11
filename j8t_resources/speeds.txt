@@ -1,0 +1,14 @@
+[0]
+text= NORMAL
+code= 0
+
+[1]
+text= SLOW
+code= 4
+
+[2]
+text= FAST
+code= 1
+[3]
+text = TURBO
+code= 2

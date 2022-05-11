@@ -1,0 +1,47 @@
+[config]
+
+# name of operator to populate [name] macro variable
+name= ken
+
+# qth to populate the [qth] macro variable
+qth= watford
+
+# How many seconds an activity entry is displayed
+stale_time= 120
+
+# the maximum offset for transmission
+max_offset= 2500
+
+# initial state of the See HB checkbox
+see_hb = yes
+
+# When the Selected Call button is pressed the offset for transmission will be:
+#    chat - a random free offset in the region 1000 - max_offset
+#    call - the offset of the selected activity
+#    current - the current offset
+selected_button_action = call
+
+# When the SEND button is pressed and the offset has not been selected the offset for transmission will be:
+#    chat - a random free offset in the region 1000 - max_offset
+#    call - the offset of the selected activity
+#    current - the current offset
+send_button_action = chat
+
+# enable backlight control.
+# if this is no, backlight control is disabled.
+# if this is yes and there is no touchscreen or no rpi-backlight warnings will be produced but operation will continue.
+enable_backlight = no
+
+# brightness of touchscreen backlight
+# 1-100, avoid 0, could cause problems
+backlight_brightness = 30
+
+# IP address of computer running js8call
+js8call_ip = 127.0.0.1
+
+# Port used by the JS8call API
+js8call_port = 2242
+
+# end of transmission character indicator
+# When it receives a Directed message js8touch appends this character to whatever has been previously sent. The text of Directed messages is not used.
+eod_marker = ♢

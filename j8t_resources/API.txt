@@ -1,0 +1,227 @@
+Need get status for proper status
+get status reanamed get op status
+need deselect
+need rig.set_ptt.on/off command
+status sent when speed or frq select, but not via the API
+how to do tune
+mode.set_speed js8call interface changes but mode.speed and station.status does not
+RIG.FREQ - difference between event and reply event has band
+SHOULD TX.SEND_MESSAGE PIC UP THE TEXT FROM SET_TEXT
+need an indication that a message has been completely sent when it has more than one frame. rig.ptt only shows each frame period.
+HB message does not send the grid in the text, only in the comand however HEATBEAT SNR does include the SNR value.
+need deselect
+status it set if frequency id changed but already set to the frequency
+get characters that are transmitted
+sometimes a number of activity messages is not folloed by a directed message diamond is shown on js8call
+what does offset mean - lowest frequency
+Ask for log button
+no operation timeout should be triggered by API or a way to inhibit t.
+need RIG.GET_PTT
+
+Messages sent on event by JS8call
+*********************************
+
+CLOSE
+------
+Sent when JS8Call has been closed
+-> params:  {'_ID': '148061743467'}
+
+PING
+----
+Keepalive from JS8Call. Sent at 15 second intervals
+-> params:  {'NAME': 'JS8Call', 'UTC': 1647361398331, 'VERSION': '2.2.1-devel', '_ID': '148062198331'}
+UTC does not seem to change?? _ID same as UTC and does not change
+
+STATION.STATUS
+--------------
+Status of the station
+  SELECT set to '' if a Call is not selected (on alternate messages?????)
+sent when something changes.
+No way to request status before first change.
+-> params:  {'DIAL': 7078000, 'FREQ': 7079552, 'OFFSET': 1552, 'SELECTED': 'F4IOG/P', 'SPEED': 0, '_ID': '148058688053'}
+
+RIG.FREQ
+--------
+Sent when the rig frequency has been changed
+See also requests which omits band ????
+-> params:  {'BAND': '20m', 'DIAL': 14078000, 'FREQ': 14079918, 'OFFSET': 1918, '_ID': -1}
+
+RIG.PTT
+-------
+Sent when PTT has been toggled
+-> value on/off
+-> params:  {'PTT': True, 'UTC': 1647362000054, '_ID': -1}
+
+
+RX.ACTIVITY
+-----------
+Sent when a frame is received.
+-> value: Text of the frame
+
+-> params:  {'DIAL': 7078000, 'FREQ': 7079596, 'OFFSET': 1596, 'SNR': 8, 'SPEED': 0, 'TDRIFT': 0.10000000149011612, 'UTC': 1647357448052, '_ID': -1}
+
+-> value G4PQP: @HB HEARTBEAT JO02 
+-> params:  {'DIAL': 7078000, 'FREQ': 7078939, 'OFFSET': 939, 'SNR': 1, 'SPEED': 4, 'TDRIFT': 0.10000000149011612, 'UTC': 1650377815121, '_ID': -1}
+
+-> value DK5SM: M0GBP HEARTBEAT SNR +05 
+-> params:  {'DIAL': 7078000, 'FREQ': 7078946, 'OFFSET': 946, 'SNR': -2, 'SPEED': 1, 'TDRIFT': 0.10000000149011612, 'UTC': 1650378838423, '_ID': -1}
+
+RX.DIRECTED – Sent at the end of a complete message
+---------------------------------------------------
+
+Heartbeat Ack
+-> value HB9BMS: G4PQP HEARTBEAT SNR +10 ♢ 
+-> params:  {'CMD': ' HEARTBEAT SNR', 'DIAL': 7078000, 'EXTRA': '+10', 'FREQ': 7078517, 'FROM': 'HB9BMS', 'GRID': '', 'OFFSET': 517, 'SNR': -8, 'SPEED': 0, 'TDRIFT': 0.10000000149011612, 'TEXT': 'HB9BMS: G4PQP HEARTBEAT SNR +10 ♢ ', 'TO': 'G4PQP', 'UTC': 1650311533718, '_ID': -1}
+
+Command
+-> value GM8JCF: G4PQP INFO? ♢ 
+-> params:  {'CMD': ' INFO?', 'DIAL': 7078000, 'EXTRA': '', 'FREQ': 7079119, 'FROM': 'GM8JCF', 'GRID': '', 'OFFSET': 1119, 'SNR': -10, 'SPEED': 0, 'TDRIFT': 0.30000001192092896, 'TEXT': 'GM8JCF: G4PQP INFO? ♢ ', 'TO': 'G4PQP', 'UTC': 1650309401704, '_ID': -1}
+
+-> value F4HVQ: PD1ODE/P  RR. TNX U FOR THIS NICE QSO. UR LOC PSE ? FOR MY LOG. GOOD NIGHT AND BEST 73. ♢ 
+-> params:  {'CMD': ' ', 'DIAL': 7078000, 'EXTRA': '', 'FREQ': 7079538, 'FROM': 'F4HVQ', 'GRID': '', 'OFFSET': 1538, 'SNR': 9, 'SPEED': 0, 'TDRIFT': 0.20000000298023224, 'TEXT': 'F4HVQ: PD1ODE/P  RR. TNX U FOR THIS NICE QSO. UR LOC PSE ? FOR MY LOG. GOOD NIGHT AND BEST 73. ♢ ', 'TO': 'PD1ODE/P', 'UTC': 1650311338012, '_ID': -1}
+
+-> value F4HVQ: PD1ODE/P  RR. TNX U FOR THIS NICE QSO. UR LOC PSE ? FOR MY LOG. GOOD NIGHT AND BEST 73. ♢ 
+-> params:  {'CMD': ' ', 'DIAL': 7078000, 'EXTRA': '', 'FREQ': 7079538, 'FROM': 'F4HVQ', 'GRID': '', 'OFFSET': 1538, 'SNR': 9, 'SPEED': 0, 'TDRIFT': 0.20000000298023224, 'TEXT': 'F4HVQ: PD1ODE/P  RR. TNX U FOR THIS NICE QSO. UR LOC PSE ? FOR MY LOG. GOOD NIGHT AND BEST 73. ♢ ', 'TO': 'PD1ODE/P', 'UTC': 1650311338012, '_ID': -1}
+
+***** RR can be a command - probably others
+
+RX.DIRECTED.ME
+--------------
+
+
+RX.SPOT
+-------
+Sent at the end of a complete message if Spotting is on.
+Generated when a QTH locator is received from a node and the option for sending reports to the Internet is enabled.
+-> params:  {'CALL': 'KC1GTU', 'DIAL': 14078000, 'FREQ': 14078861, 'GRID': '', 'OFFSET': 861, 'SNR': -8, '_ID': -1}
+
+
+
+TX.FRAME
+--------
+Sent when a frame is transmitted
+-> params:  {'TONES': [0, 6, 2, 3, 5, 4, 1, 3, 4, 0, 6, 4, 0, 3, 5, 7, 5, 5, 0, 5, 5, 3, 1, 0, 2, 0, 3, 3, 7, 5, 0, 1, 2, 3, 4, 1, 1, 5, 0, 2, 3, 6, 4, 0, 2, 5, 6, 0, 4, 7, 5, 0, 2, 7, 6, 6, 1, 6, 5, 3, 0, 3, 7, 7, 2, 5, 0, 3, 7, 3, 2, 4, 2, 5, 0, 6, 4, 1, 3], '_ID': -1}
+
+
+Loging
+-------
+LOG.QSO - Details of QSO submitted to log
+
+REQUESTS AND REPLIES
+*********************
+Reply has the same _ID as the request
+
+Band Activity
+-------------
+RX.BAND_ACTIVITY – The band activity window
+RX.GET_BAND_ACTIVITY – Get the contents of the band activity window
+
+
+Call Activity
+-------------
+RX.CALL_ACTIVITY – The call activity window
+RX.GET_CALL_ACTIVITY – Get the contents of the call activity window
+
+
+Selected Callsign
+-----------------
+RX.CALL_SELECTED – The currently selected callsign
+RX.GET_CALL_SELECTED – Get the currently selected callsign
+
+
+Received Text
+-------------
+RX.TEXT – Contents of the QSO window
+RX.GET_TEXT – Get the contents of the QSO window
+
+
+Station's Callsign
+----------------
+STATION.CALLSIGN – Callsign of the station
+STATION.GET_CALLSIGN – Get the station callsign
+
+
+Station's Grid
+--------------
+STATION.GRID - grid locator of the station
+-> value IO91TP
+-> params:  {'_ID': 1647375063331}
+
+STATION.GET_GRID - Get the station grid
+ "value": "", "params": {"_ID": 1647375063331}}
+
+STATION.SET_GRID – Set the station grid
+
+
+Station's  Information
+--------------------
+STATION.INFO
+STATION.GET_INFO – Get the station QTH/info
+STATION.SET_INFO – Set the station QTH/info
+
+
+Station's Status
+***************
+!!!!!different content in same message type
+STATION.STATUS
+-> value ON AIR
+-> params:  {'_ID': 1648324773551}
+
+STATION.GET_STATUS – Get the station status
+STATION.SET_STATUS – Set the station status
+
+
+Mode Speed
+----------
+MODE.SPEED – The current TX speed
+
+-> MODE.SPEED
+-> params:  {'SPEED': 0, '_ID': 1648325508552}
+
+MODE.GET_SPEED – Get the TX speed
+
+MODE.SET_SPEED – Set the TX speed
+json - {"type": "MODE.SET_SPEED", "value": "", "params": {"SPEED": "4", "_ID": 1648825700573}}
+
+'SLOW',   '4'
+'NORMAL', '0'
+'FAST',   '1'
+'TURBO',  '2'
+
+		// `MODE.SET_SPEED` seems to be buggy in the API. While the UI changes in the dropdown,
+		// the mode is not changed, and querying with `MODE.GET_SPEED` always returns the previous speed.
+		// A similar issue also affects `STATION.SET_GRID` and `STATION.SET_INFO`
+		// See: https://bitbucket.org/widefido/js8call/issues/350/mode-button-text-does-not-update
+
+Rig's Frequency
+---------------
+RIG.FREQ - Reply to RIG.GET_FREQ
+See also RIG.FREQ event message which adds Band
+-> params:  {'DIAL': 14078000, 'FREQ': 14079918, 'OFFSET': 1918, '_ID': 1647375063331}
+
+RIG.GET_FREQ - Get the current dial freq and offset
+ "value": "", "params": {"_ID": 1647375063331}}
+
+RIG.SET_FREQ – Set the current dial freq and offset of the station
+json - {"type": "RIG.SET_FREQ", "value": "", "params": {"DIAL": "14078000", "OFFSET": 977, "_ID": 1648821412550}}
+
+
+Transmitted Text
+-----------------
+TX.TEXT - Text ready for transmission
+TX.GET_TEXT
+TX.SET_TEXT – Sets the text in the outgoing message box, but does not send it.
+TX.SEND_MESSAGE – Send a message via JS8Call
+
+Received Messages
+--------
+INBOX.MESSAGES – A list of inbox messages
+INBOX.MESSAGE – A single inbox message
+INBOX.GET_MESSAGES – Get a list of inbox messages
+INBOX.STORE_MESSAGE – Store a message in the inbox
+
+
+
+JS8Call's Window
+----------------
+WINDOW.RAISE – Focus the JS8Call window
