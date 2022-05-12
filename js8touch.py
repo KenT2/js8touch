@@ -196,7 +196,7 @@ class JS8Touch(object):
 
     #read config.txt configuration
     def make_config(self):
-        filename='j8t_resources/config.txt'
+        filename='config/config.txt'
         self.log('Reading Configuration from '+ filename)
         conf = configparser.ConfigParser()
         conf.read(filename)
@@ -347,7 +347,7 @@ class JS8Touch(object):
              
    # read the macros from macros.txt and create the macro buttons
     def make_buttons(self):
-        filename='j8t_resources/macros.txt'
+        filename='config/macros.txt'
         self.log('read macros from ',filename)
         macros_c = configparser.ConfigParser()
         macros_c.read(filename)
@@ -414,7 +414,10 @@ class JS8Touch(object):
         
     def expand_macro(self,var):
         if var=='[SNR]':
-            return str(self.selected_snr)
+            if self.selected_snr>0:
+                return '+'+str(self.selected_snr)
+            else:    
+                return str(self.selected_snr)
         elif var=='[CALL]':
             return self.selected_callsign
         elif var=='[MYCALL]':
@@ -498,7 +501,7 @@ class JS8Touch(object):
     #read bands.txt configuration
     def make_bands(self):
         self.band_list=list()
-        filename='j8t_resources/bands.txt'
+        filename='config/bands.txt'
         self.log('Reading bands from '+ filename)
         macros_c = configparser.ConfigParser()
         macros_c.read(filename)
@@ -539,7 +542,7 @@ class JS8Touch(object):
     def make_speeds(self):
         self.speed_list=list()
         self.reverse_speed=dict()
-        filename='j8t_resources/speeds.txt'
+        filename='config/speeds.txt'
         self.log('Reading Speeds from '+ filename)
         macros_c = configparser.ConfigParser()
         macros_c.read(filename)
@@ -647,6 +650,8 @@ class JS8Touch(object):
                         self.display_selected_info()
                         self.rx_text.insert(tk.END,self.eod_marker+'\n')
                         self.rx_text.see(tk.END)
+                self.root.update()
+                # stop searching after first matching entry        
                 return
                 
         # no match create a new entry
@@ -692,7 +697,7 @@ class JS8Touch(object):
             self.activity.set(new_entry,'callsign',params['FROM'])
             self.activity.set(new_entry,'grid',params['GRID'])
             self.activity.set(new_entry,'type','directed')
-            self.activity.set(new_entry,'message',0)
+            self.activity.set(new_entry,'message',value)
             self.log('CREATE new entry from Directed',new_entry,value)
             # ?????new_entry['message']+=self.eod_marker+'\n'
         
@@ -700,7 +705,7 @@ class JS8Touch(object):
     # find a callsign in the first characters of a RX.ACTIVITY message
     def find_callsign(self,text):
         x=text.find(':')
-        if x>10:
+        if x>10 or x==-1:
             return '?????'
         return text[0:x]
 
@@ -1031,7 +1036,7 @@ class JS8Touch(object):
         shutil.copy2(source_dir+'speeds.txt',dest_dir)
         shutil.copy2(source_dir+'config.txt',dest_dir)
         self.show_warning('First Run Complete, now edit config/config.text\n and then restart js8touch')
-        self.log('First Run Complete, now edit config/config.text and restart js8touch')
+        self.log('First Run Complete, now edit config/config.txt for name and QTH. Then restart JS8Touch')
         exit(0)
         
 

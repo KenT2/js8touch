@@ -1,10 +1,10 @@
 [config]
 
 # name of operator to populate [name] macro variable
-name= ken
+name= someone
 
 # qth to populate the [qth] macro variable
-qth= watford
+qth= somewhere
 
 # How many seconds an activity entry is displayed
 stale_time= 120

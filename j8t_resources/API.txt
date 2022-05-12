@@ -17,6 +17,7 @@ what does offset mean - lowest frequency
 Ask for log button
 no operation timeout should be triggered by API or a way to inhibit t.
 need RIG.GET_PTT
+Need deselect
 
 Messages sent on event by JS8call
 *********************************

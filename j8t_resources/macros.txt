@@ -52,16 +52,16 @@ text= |HEARTBEAT [GRID4]>
 [macro6]
 name= |kb-call
 offset = call
-text= |[CALL]
+text= |[CALL] 
 
 [macro7]
 name= |kb-chat
 offset = chat
-text= |[CALL]
+text= |[CALL] 
 
 [macro8]
 name= |kb-cur
 offset = current
-text= |[CALL]
+text= |[CALL] 
 
 
