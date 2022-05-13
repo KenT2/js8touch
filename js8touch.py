@@ -595,14 +595,15 @@ class JS8Touch(object):
     # else insert as a new activity
     def update_activity(self,typ,value,params):
         #print ('UPD',value)
-        # ignore HB messages if checkbox unset
-        if self.hb_display_enable.get() == 0 and 'HEARTBEAT' in value:
-            return
-            
+
         # if its for me put it in the rx text window
         if typ=='RX.DIRECTED.ME':
             self.rx_text.insert(tk.END,'\nME!!! '+value)
             self.rx_text.see(tk.END)
+            
+        # ignore HB messages if checkbox unset
+        if self.hb_display_enable.get() == 0 and 'HEARTBEAT' in value:
+            return
             
         frequency=params['FREQ']
         # is this frequency in activity list
@@ -615,6 +616,7 @@ class JS8Touch(object):
                 self.activity.set(item,'offset',params['OFFSET'])
                 self.activity.set(item,'speed',params['SPEED'])
                 if typ=='RX.ACTIVITY':
+                    # add the message to activity or directed already there
                     new_message=self.activity_get(item,'message')+value
                     self.activity.set(item,'message',new_message)                    
                     rolled=self.roll_activity(new_message,self.roll_width)
@@ -632,14 +634,13 @@ class JS8Touch(object):
                         self.rx_text.see(tk.END)
                 else:
                     #directed
-                    # full message is received with EOT marker, callsign and grid. Ignore the message except to add an EOT marker
+                    # full message is received with EOT marker, callsign and grid. Ignore the message except to add an EOT marker to activity
                     new_message=self.activity_get(item,'message')+ ' '+ self.eod_marker+'\n'
-                    self.activity.set(item,'message',new_message)
-                    self.activity.set(item,'callsign',params['FROM'])
-                    self.activity.set(item,'grid',params['GRID'])
                     rolled=self.roll_activity(new_message,self.roll_width)
                     #print ('rolled act',rolled)
                     self.activity.set(item,'rolled_message',rolled)
+                    self.activity.set(item,'callsign',params['FROM'])
+                    self.activity.set(item,'grid',params['GRID'])
                     self.activity.set(item,'type','directed')
                     self.log ('UPDATE with Directed',item,value)                    
                     
@@ -682,22 +683,31 @@ class JS8Touch(object):
         self.activity.set(new_entry,'frequency',params['FREQ'])
         self.activity.set(new_entry,'age',0)
         self.activity.set(new_entry,'age_secs',0)
-        self.activity.set(new_entry,'message',value)
+
         self.activity.set(new_entry,'snr',params['SNR'])
         self.activity.set(new_entry,'speed',params['SPEED'])
         self.activity.set(new_entry,'item_id',new_entry)
-                         
+
         if mtype == 'activity':
+            # first message is activity
             self.activity.set(new_entry,'callsign',self.find_callsign(value))
             self.activity.set(new_entry,'grid','')
             self.activity.set(new_entry,'type','activity')
+            self.activity.set(new_entry,'message',value)
+            rolled=self.roll_activity(value,self.roll_width)
+            #print ('rolled act',rolled)
+            self.activity.set(new_entry,'rolled_message',rolled)
             self.log('CREATE new entry from Activity',new_entry,value)
         else:
             # directed
+            # first message is directed
             self.activity.set(new_entry,'callsign',params['FROM'])
             self.activity.set(new_entry,'grid',params['GRID'])
             self.activity.set(new_entry,'type','directed')
-            self.activity.set(new_entry,'message',value)
+            self.activity.set(new_entry,'message',value +'\n')
+            rolled=self.roll_activity(value,self.roll_width)
+            #print ('rolled dir',rolled)
+            self.activity.set(new_entry,'rolled_message',rolled)
             self.log('CREATE new entry from Directed',new_entry,value)
             # ?????new_entry['message']+=self.eod_marker+'\n'
         
