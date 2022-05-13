@@ -22,7 +22,7 @@ INSTALLING JS8TOUCH
 ===================
 Using a browser download the application by clicking on the green CODE button and selecting Download Zip.
 
-In the downloads directory of your RPi extract the code from the archive and copy or move the resulting directory to be in the home directory. Rename it to js8touch so that in the future any autostart code I provide will work.
+In the downloads directory of your RPi extract the code from the archive js8touch-master.zip and copy or move the resulting directory to be in the home directory. Rename it to js8touch so that in the future any autostart code I provide will work.
 
 
 1. Change the settings of JS8Call so it interfaces with JS8Touch:
