@@ -1,0 +1,19 @@
+
+Version 1.1.1b
+--------------
+enhanced - Now sets focus on Transmit Text Area when pressing Selected Frequency Button or a non-auto macro button
+enhanced - don't log heartbeat messages when See HB is off
+enhanced - [SPACE] macro to insert a space. Useful as macros.txt format does not allow trailing spaces.
+
+fixed - disable offset button during sending of a message
+fixed - inhibit RX.ACTIVITY and RX.DIRECTED until connected
+fixed - missing EOM marker for RX.DIRECTED messages
+fixed - LOG.QSO is a known unhandled message
+fixed - offset field in macros.txt is now case insensitive.
+fixed - callsign set on update by RX.ACTIVITY
+fixed - remove second space after [CALL] macro variable
+fixed - matching for Band Frequency Table is by callsign in addition to frequency
+fixed - remove auto transmit in many example macros - op wil need to press send
+fixed - Transmit text scrolls to the end of long text
+fixed - SNR is updated when messages are received
+fixed - SEND button does not change size during transmission

@@ -1,7 +1,7 @@
 [config]
 
 # name of operator to populate [name] macro variable
-name= someone
+name= me
 
 # qth to populate the [qth] macro variable
 qth= somewhere
@@ -15,7 +15,7 @@ max_offset= 2500
 # initial state of the See HB checkbox
 see_hb = yes
 
-# When the Selected Call button is pressed the offset for transmission will be:
+# When the Selected Frequency button is pressed the offset for transmission will be:
 #    chat - a random free offset in the region 1000 - max_offset
 #    call - the offset of the selected activity
 #    current - the current offset

@@ -1,11 +1,17 @@
+# section name can be any single wrod providing it is unique
+# band - displayed text
+# offset - initial offset for the band
+
 [0]
 band=40m
 dial=7078000
 offset= 1812
+
 [1]
 band = 20m
 dial= 14078000
 offset= 1812
+
 [2]
 band=10m
 dial=28078000

@@ -1,9 +1,4 @@
 
-#from tkinter import *
-#import tkinter as tk
-
-#from tkinter.ttk import *
-
 import tkinter as tk
 from tkinter import ttk
 
@@ -30,7 +25,7 @@ class JS8Touch(object):
         # init logging,TURN IT OFF HERE
         self.init_log(True)
         
-        self.js8touch_version='1.1.1a'
+        self.js8touch_version='1.1.1b'
         self.log('JS8Touch Version '+self.js8touch_version)
         
         # get Tkinter
@@ -48,7 +43,10 @@ class JS8Touch(object):
         self.send_button_action = ''   # chat or call
         self.backlight_brightness=100 #overidden by config.txt
         self.enable_touchscreen='no'
-        self.see_hb=0 # overridden by config.txt
+        self.initial_hb_enable=0
+        self.js8call_ip=''
+        self.js8call_port=0
+        self.eod_marker='T'
         self.make_config()
 
         # config things from js8call, read after server connected
@@ -57,7 +55,7 @@ class JS8Touch(object):
         self.my_grid = ''
         self.my_grid6=''
                
-        # init activity list
+        # init selected activity
         self.selected_activity_urn='' # item id from treview which is unique
         self.selected_message = ''
         self.selected_callsign=''
@@ -70,18 +68,17 @@ class JS8Touch(object):
         self.station_offset=''
         self.station_speed=''
         self.station_ptt=''
+        self.station_selected='' #from js8call, not used, js8touch has its own selection
         
-        self.station_selected='' #used to check something selected before transmission, js8touch has its own selection
-
-        self.status_received=False # don't display the status until it is first received
-        
+        # other variables
         self.connected=False # disable calls to js8call until it is connected.
-        self.tx_offset=-1 # offset for transmission
-        self.transmitting = False
-        self.pre_hb_offset = -1 # offset before heartbeat is transmitted
+        self.status_received=False # don't display the status until it is first received
         self.offset_code = ''  #offset code from pressed macro button
-        self.last_tx_text ='' #????? not used last non zero tx text got from js8call
-        self.last_activity_type = 'RX.ACTIVITY' # used to control newlines in rx_text area
+        self.tx_offset=-1 # offset for transmission
+        self.pre_hb_offset = -1 # offset before heartbeat is transmitted
+        self.transmitting = False
+        self.last_tx_text ='' #last non zero tx text got from js8call
+
         
         #Init touchscreen and backlight
         if self.enable_backlight == 'yes':
@@ -93,6 +90,7 @@ class JS8Touch(object):
             if status != 'normal':
                 self.show_warning(message)
             self.log('Touchscreen Initilaised')
+            
         # make the gui
         self.make_gui()
         self.make_bands()  #read bands from bands.txt
@@ -119,12 +117,13 @@ class JS8Touch(object):
 
     # execute some things at regular intervals
     def gui_ticker(self):
-        self.display_status()
+        self.display_status() # for UTC
         self.age_activity()
         self.root.after(10000,self.gui_ticker)
 
 
     # callback when server is connected to JS8call and commands can be sent
+    # also deals with reconnection
     def connected_callback(self,connected):
         if connected is True:
             self.connected=True
@@ -146,6 +145,7 @@ class JS8Touch(object):
             self.connected=False
             self.band_button.config(state='disabled')
             self.speed_button.config(state='disabled')
+            self.offset_button.config(state='disabled')
             self.send_button.config(state='disabled')
             self.control_macro_buttons('disabled')
             self.root.update()
@@ -161,6 +161,9 @@ class JS8Touch(object):
     def event_callback(self,typ,value,params):
             
         if typ in ('RX.ACTIVITY','RX.DIRECTED','RX.DIRECTED.ME'):
+            # ignore received messages until connected
+            if self.connected is False:
+                return
             self.log_activity(typ,value,params)
             self.update_activity(typ,value,params)
             
@@ -188,9 +191,9 @@ class JS8Touch(object):
             self.log('JS8Call Closed')
             self.show_warning('JS8Call has closed')
 
-    # reply message to command sent to js8call received
+    # reply message to command sent to js8call received - there are none
     def reply_callback(self,typ,reply):
-        print('Gui reply: ',typ,reply)
+        self.log('Reply Received: ',typ,reply)
         
 
 
@@ -228,7 +231,6 @@ class JS8Touch(object):
     # TRANSMIT
     # ==============================
 
-
     def transmit(self):
         # set the offset to value in config.txt if user SEND's without using a macro or Selected frequency button
         self.pre_hb_offset=self.station_offset
@@ -242,9 +244,10 @@ class JS8Touch(object):
         
         # SEND_MESSAGE needs the text, it does not take it from TX_TEXT
         text=self.tx_text.get(1.0,tk.END)[:-1].upper()
-        self.log('transmitting message')
+        self.log('Transmitting Message')
         self.s.send('TX.SEND_MESSAGE',text)
         self.tx_text.delete(1.0,tk.END)
+        self.tx_text.see(tk.END)
         # reset offset so if Send used without using a macro will transmit on a free chat offset
         self.tx_offset= -1
         
@@ -252,6 +255,7 @@ class JS8Touch(object):
         self.band_button.config(state='disabled')
         self.speed_button.config(state='disabled')
         self.send_button.config(state='disabled')
+        self.offset_button.config(state='disabled')
         self.control_macro_buttons('disabled')
         
         # and monitor TX.TEXT for end of transmission
@@ -284,6 +288,7 @@ class JS8Touch(object):
             # enable buttons
             self.band_button.config(state='normal')
             self.speed_button.config(state='normal')
+            self.offset_button.config(state='normal')
             self.control_macro_buttons('normal')
             
             # return to the previous frequency after sending a heartbeat
@@ -301,10 +306,9 @@ class JS8Touch(object):
         self.tx_text.insert(tk.END,value,('a',))
         
         self.send_button.config(state='normal')
-        #self.root.update()
         if self.station_ptt == 'on':
             #self.log('PTT is ON')
-            self.send_button.config(text='TX',bg='red')
+            self.send_button.config(text=' TX  ',bg='red')
         elif self.transmitting is True:
             #self.log('sending')
             self.send_button.config(text='WAIT',bg='green')
@@ -338,7 +342,8 @@ class JS8Touch(object):
         else:
             self.show_warning ('unknown selected button_action in config.txt')
         self.tx_text.delete(1.0,tk.END)
-        self.tx_text.insert(tk.END,self.selected_callsign+' ') 
+        self.tx_text.insert(tk.END,self.selected_callsign+' ')
+        self.tx_text.focus_set()
 
         
     # ==============================
@@ -376,9 +381,9 @@ class JS8Touch(object):
             
     # user pressed a macro button.
     def use_macro(self,offset_code,text):
-        self.offset_code=offset_code
+        self.offset_code=offset_code.lower()
         # calc the offset
-        self.tx_offset=self.calc_tx_offset(offset_code)
+        self.tx_offset=self.calc_tx_offset(self.offset_code)
         if self.tx_offset==-1:
             return
         
@@ -398,6 +403,8 @@ class JS8Touch(object):
         self.log ('macro button pressed: ',text,'Auto=',auto_tx,'Offset Code=',self.offset_code,'offset=',self.tx_offset)
         if auto_tx == True:
             self.transmit()
+        else:
+            self.tx_text.focus_set()
         return
 
     ### macro expansion
@@ -432,7 +439,8 @@ class JS8Touch(object):
             return self.my_name
         elif var=='[QTH]':
             return self.my_qth 
-            
+        elif var=='[SPACE]':
+            return ' '             
     ### offset
     
     # compute the tx_offset from the offset field
@@ -440,6 +448,8 @@ class JS8Touch(object):
         if offset_code== 'current':
             return self.station_offset
         elif offset_code == 'hb':
+            if self.hb_display_enable.get() == 0:
+                self.show_warning('See HB is Off so no replies will be seen.')
             return self.random_offset(500,1000)
         elif offset_code == 'chat':
             return self.random_offset(1000,self.max_offset)
@@ -604,19 +614,29 @@ class JS8Touch(object):
         # ignore HB messages if checkbox unset
         if self.hb_display_enable.get() == 0 and 'HEARTBEAT' in value:
             return
-            
         frequency=params['FREQ']
+        if typ =='RX.DIRECTED':
+            callsign= params['FROM']
+            print ('from directed',callsign)
+        else:
+            callsign=self.find_callsign(value)
+            print ('from activity find',callsign)
+
         # is this frequency in activity list
         for item in self.activity.get_children():
-            if abs(self.activity_get(item,'frequency')-frequency)<10:
+            if abs(self.activity_get(item,'frequency')-frequency)<10\
+            or (callsign ==self.activity_get(item,'callsign') and callsign!= '?????' ):
                 #found a match update activity table
                 self.activity.set(item,'age',0)
                 self.activity.set(item,'age_secs',0)
                 self.activity.set(item,'frequency',frequency)
                 self.activity.set(item,'offset',params['OFFSET'])
                 self.activity.set(item,'speed',params['SPEED'])
+                self.activity.set(item,'snr',params['SNR'])
                 if typ=='RX.ACTIVITY':
                     # add the message to activity or directed already there
+                    if callsign != '?????':
+                        self.activity.set(item,'callsign',callsign)
                     new_message=self.activity_get(item,'message')+value
                     self.activity.set(item,'message',new_message)                    
                     rolled=self.roll_activity(new_message,self.roll_width)
@@ -636,10 +656,11 @@ class JS8Touch(object):
                     #directed
                     # full message is received with EOT marker, callsign and grid. Ignore the message except to add an EOT marker to activity
                     new_message=self.activity_get(item,'message')+ ' '+ self.eod_marker+'\n'
+                    self.activity.set(item,'message',new_message)
                     rolled=self.roll_activity(new_message,self.roll_width)
                     #print ('rolled act',rolled)
                     self.activity.set(item,'rolled_message',rolled)
-                    self.activity.set(item,'callsign',params['FROM'])
+                    self.activity.set(item,'callsign',callsign)
                     self.activity.set(item,'grid',params['GRID'])
                     self.activity.set(item,'type','directed')
                     self.log ('UPDATE with Directed',item,value)                    
@@ -742,7 +763,6 @@ class JS8Touch(object):
         item = self.activity.selection()[0]
         self.selected_activity_urn=item   
         self.update_selected_params(item)
-        self.last_activity_type='RX.ACTIVITY'
         #print ('\nselect item ',item,self.selected_callsign)        
         # add message to received text
         self.rx_text.insert(tk.END,'------------\n'+self.selected_message)
@@ -867,7 +887,7 @@ class JS8Touch(object):
         self.rx_height= 14
         self.tx_height= 5
         
-        self.roll_width=self.message_width+4
+        self.roll_width=self.message_width+3
         self.treeview_width = 14+self.message_width #sum of the columns
         self.rxtx_text_width= self.areas_width - self.treeview_width #adjusts automatically with areas width and message_width
 
@@ -917,7 +937,7 @@ class JS8Touch(object):
         self.activity.heading('snr', text='S')
         self.activity.column('snr',width=4*pix,anchor=tk.E)
         self.activity.heading('rolled_message', text='Message')
-        self.activity.column('rolled_message',width=self.message_width*pix)
+        self.activity.column('rolled_message',width=self.message_width*pix,anchor=tk.W)
         self.activity.bind('<<TreeviewSelect>>', self.select_activity)
         self.activity.grid(row=0, column=0,pady=(5,0))
 
@@ -1000,9 +1020,8 @@ class JS8Touch(object):
 
 
     def log_activity(self,typ,value,params):
-        if 'HEARTBEAT' in value:
-            pass
-            #return
+        if self.hb_display_enable.get() == 0 and 'HEARTBEAT' in value:
+            return
         if typ == 'RX.ACTIVITY':
             self.log('Rx from JS8Call ACTIVITY',params['OFFSET'],'??????',value,gap='above')
         elif typ == 'RX.DIRECTED':

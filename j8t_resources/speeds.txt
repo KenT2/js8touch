@@ -1,3 +1,5 @@
+# section name can be any single word provided it is unique
+
 [0]
 text= NORMAL
 code= 0
@@ -9,6 +11,7 @@ code= 4
 [2]
 text= FAST
 code= 1
+
 [3]
 text = TURBO
 code= 2

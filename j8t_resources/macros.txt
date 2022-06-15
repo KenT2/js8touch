@@ -1,18 +1,15 @@
 #USING MACROS
+# See the manual for defining macros.
+
+#section name:
+#can be any single word but must be unique
+
 #offset:
-# call - trasmit on the offset of the selected activity
+# call - transmit on the offset of the selected activity
 # chat - transmit on a random offset in the chat region
 # hb - transmit on a random offset in the heartbeat region then return
 # current - use current offset
 
-#FREE TEXT ENTRY
-# if 'Selected Call' button is used will Tx on
-#  - offset of call
-#  or random chat
-#  or current offset
-#depends on config. and put call in Tx area
-
-# if no macro is used before typing or send then chat random offset is used.
 
 [macro0]
 name= |CQ>
@@ -25,24 +22,24 @@ offset = call
 text=|[CALL] HW CPY?>
 
 [macro2]
-name= |SNR>
+name= SNR
 offset = call
-text= [CALL] GOOD COPY SNR [SNR]>
+text= [CALL] GOOD COPY SNR [SNR]
 
 [macro3]
-name= |ME>
+name= ME
 offset = call
-text= |[CALL] OP [NAME] QTH [QTH] [GRID6]>
+text= [CALL] OP [NAME] QTH [QTH] [GRID6]
 
 [macro31]
-name= |BRAG>
+name= BRAG
 offset = call
-text= |[CALL] RIG: RPI4 40 WATTS G5RV AT 5M>
+text= [CALL] RIG: RPI4 40 WATTS G5RV AT 5M
 
 [macro4]
 name= |BYE>
 offset = call
-text= |[CALL] TNX 73 STAY SAFE SK>
+text= |[CALL] TNX FOR FB QSO 73 STAY SAFE SK>
 
 [macro5]
 name= |HB>
@@ -52,16 +49,16 @@ text= |HEARTBEAT [GRID4]>
 [macro6]
 name= |kb-call
 offset = call
-text= |[CALL] 
+text= |[CALL]
 
 [macro7]
 name= |kb-chat
 offset = chat
-text= |[CALL] 
+text= |[CALL]
 
 [macro8]
 name= |kb-cur
 offset = current
-text= |[CALL] 
+text= |[CALL]
 
 

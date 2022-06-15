@@ -64,8 +64,9 @@ class Server(object):
             self.ping_timeout= 150 # make disconnection happen after 5 secs
             self.close()
             pass
-            
-        elif typ in('TX.FRAME','RX.SPOT'):
+        
+        # I know these messages are unhandled
+        elif typ in('TX.FRAME','RX.SPOT','LOG.QSO'):
             return
             
         else:

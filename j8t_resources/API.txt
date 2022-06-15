@@ -18,6 +18,7 @@ Ask for log button
 no operation timeout should be triggered by API or a way to inhibit t.
 need RIG.GET_PTT
 Need deselect
+messaage if rig disconnected
 
 Messages sent on event by JS8call
 *********************************
